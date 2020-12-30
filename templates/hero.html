@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="utf-8"/>
+    <title>{hero_name_title} - Overwatch MiniWiki</title>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+<header>
+    <nav>
+        <ul class="nav-bar">
+            <li><a href="../../wiki.html" class="nav-item">Home</a></li>
+            <li><a href="../tank.html" class="nav-item active-nav">Tank</a></li>
+            <li><a href="../damage.html" class="nav-item">Damage</a></li>
+            <li><a href="../support.html" class="nav-item">Support</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="content-wrapper">
+    <h1 class="hero-name">{hero_name}</h1>
+    <img class="hero-icon hero-icon-individual" src="../../img/hero-icons/{hero_pic}.png" alt="{hero_name_alt}">
+    <h3 class="section-heading">Overview</h3>
+    <div class="overview-section">
+        <ul style="list-style-type:none;">
+            <li><b>Description</b>: {hero_description}</li>
+            <li><b>HP</b>: {hero_hp}</li>
+        </ul>
+    </div>
+    <h3 class="section-heading">Abilities</h3>
+    <div class="ability-section">
+        <ul style="list-style-type:none;">
+            {abilities}
+        </ul>
+    </div>
+</div>
+</body>
+</html>
