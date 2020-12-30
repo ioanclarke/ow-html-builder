@@ -1,3 +1,3 @@
-This is a tool to automatically scrape data from the Overwatch wiki and incorporate it
-into html files, to help me build my Overwtach miniwiki.  
-Also includes a tool to download ability icons from the Overwatch website.
+This tool automatically scrapes data from the [Overwatch Wiki](https://overwatch.gamepedia.com/Overwatch_Wiki) and puts it
+into html files, to help me build my [Overwtach miniwiki](https://github.com/ioanclarke/ioaclarke.tech/tree/master/projects/overwatch-miniwiki).  
+Also includes tools to download ability icons and patch notes info from the [Overwatch website](https://playoverwatch.com/en-us/).
