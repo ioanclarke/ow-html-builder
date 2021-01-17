@@ -10,9 +10,9 @@
     <nav>
         <ul class="nav-bar">
             <li><a href="../../wiki.html" class="nav-item">Home</a></li>
-            <li><a href="../tank.html" class="nav-item active-nav">Tank</a></li>
-            <li><a href="../damage.html" class="nav-item">Damage</a></li>
-            <li><a href="../support.html" class="nav-item">Support</a></li>
+            <li><a href="../tank.html" class="nav-item {tank_active}">Tank</a></li>
+            <li><a href="../damage.html" class="nav-item {damage_active}">Damage</a></li>
+            <li><a href="../support.html" class="nav-item {support_active}">Support</a></li>
         </ul>
     </nav>
 </header>
@@ -24,6 +24,8 @@
         <ul style="list-style-type:none;">
             <li><b>Description</b>: {hero_description}</li>
             <li><b>HP</b>: {hero_hp}</li>
+            {armor}
+            {shield}
         </ul>
     </div>
     <h3 class="section-heading">Abilities</h3>

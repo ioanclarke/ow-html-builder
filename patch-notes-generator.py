@@ -11,7 +11,7 @@ def fetch_content(url):
 
 
 def fetch_patch_data(soup):
-    patch_no = 2
+    patch_no = 0
     patch = soup.findAll('div', class_='PatchNotes-patch')[patch_no]
     patch_date = patch.find('div', class_='PatchNotes-date').text
     print(f'Getting patch data for {patch_date}\n')
@@ -73,7 +73,7 @@ def create_patch_html(date, hero_updates):
                                               ability_name.lower().replace(' ', '-'))
                 abil_temp = abil_temp.replace('{ability_name_alt}', ability_name)
                 abil_temp = abil_temp.replace('{ability_name}', ability_name)
-                abil_temp = abil_temp.replace('{ability_desc}', ability_desc)
+                abil_temp = abil_temp.replace('{ability_desc}', ability_desc.replace('\n', '<br>\n'))
             updates += abil_temp
 
         update_temp = update_temp.replace('{updates}', updates)
@@ -83,10 +83,9 @@ def create_patch_html(date, hero_updates):
 
 
 def write_to_file(content):
-    os.chdir('./out')
     filename = 'wiki.html'
-    with open(filename, 'w', encoding='utf-8') as wiki:
-        print(f'Writing to {filename}')
+    with open(f'out/{filename}', 'w', encoding='utf-8') as wiki:
+        print(f'Writing to out/{filename}')
         wiki.write(content)
 
 
