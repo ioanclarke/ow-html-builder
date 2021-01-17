@@ -22,7 +22,7 @@ def fetch_patch_data(soup):
         abil_update_list = []
         gen_update_list = []
         hero_name = hero_update.find('h5', class_='PatchNotesHeroUpdate-name').text.strip()
-        # print(hero_name)
+        # print(name)
 
         general_updates = hero_update.findAll('div', class_='PatchNotesHeroUpdate-generalUpdates')
         for general_update in general_updates:
@@ -54,7 +54,7 @@ def create_patch_html(date, hero_updates):
         print(f'Writing patch data for {hero_name}\n')
         update_temp = update_temp.replace('{hero_name_pic}', hero_name.lower().replace(' ', '-').replace('.', ''))
         update_temp = update_temp.replace('{hero_name_alt}', hero_name)
-        update_temp = update_temp.replace('{hero_name}', hero_name)
+        update_temp = update_temp.replace('{name}', hero_name)
 
         updates = ''
 

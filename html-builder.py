@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup as Bs
 
-
 hero_names = ['D.Va', 'Orisa', 'Reinhardt', 'Roadhog', 'Sigma', 'Winston', 'Wrecking_Ball', 'Zarya', 'Ashe', 'Bastion',
               'Doomfist', 'Echo', 'Genji', 'Hanzo', 'Junkrat', 'Mccree', 'Mei', 'Pharah', 'Reaper',
               'Soldier:_76', 'Sombra', 'Symmetra', 'Torbjörn', 'Tracer', 'Widowmaker', 'Ana', 'Baptiste', 'Brigitte',
@@ -30,9 +29,12 @@ def fetch_hero_details(name):
     source_text = soup.find('textarea', {'id': 'wpTextbox1'}).text
 
     # Finds role
-    if name == 'Ana':
+    # TODO fix role grabber for Ana and Moira
+    role = None
+    if name == 'Ana' or name == 'Moira':  # Because they have weird role formats.
         role = 'Support'
     else:
+        role_uncut = None
         role_pos = source_text.find('role =')
         if source_text[role_pos + 6] == ' ':
             role_uncut = source_text[role_pos + 9:]
@@ -40,8 +42,10 @@ def fetch_hero_details(name):
             role_uncut = source_text[role_pos + 8:]
         else:
             print('WHACK ASS ROLE PLACEMENT')
-        role = role_uncut[:role_uncut.find(']')]
-
+        if role_uncut:
+            role = role_uncut[:role_uncut.find(']')]
+        else:
+            print('ERROR: role_uncut DOESN\'T EXIST')
     # Finds description
     overview_pos = source_text.find('==Overview==')
     if overview_pos == -1:
@@ -60,7 +64,6 @@ def fetch_hero_details(name):
     desc_end = min(desc_uncut[desc_start:].find('\n'), desc_uncut[desc_start:].find('<'))
     desc = desc_uncut[desc_start:desc_end]
 
-    # TODO fix finding hp, armour, shield
     # Finds HP
     health_pos = source_text.find('health =')
     hp_uncut = source_text[health_pos + 8:]
@@ -80,10 +83,15 @@ def fetch_hero_details(name):
         shield_uncut = source_text[shield_pos + 8:]
         shield = shield_uncut[:shield_uncut.find('\n')].strip()
 
-    return role, desc, hp, armor, shield
+    if not role:
+        print('ERROR: ROLE NOT FOUND')
+    else:
+        return role, desc, hp, armor, shield
 
 
 def fetch_ability_details(soup):
+    # TODO fix passive abilities showing keybind as M1
+    # TODO fix bastion showing guns as M2
     ability_dets = []
     keybinds = ['SPACE', 'E', 'Q', 'LSHIFT', 'LCONTROL']
     # Finds all ability name divs
@@ -127,8 +135,6 @@ def fetch_ability_details(soup):
 
 
 def replace_template_strings(name, role, desc, hp, armor, shield, ability_dets):
-    # TODO fix active-nav to show proper role
-
     # ability dets is a list of tuples. in each tuple, 1st elem is ability name, 2nd elem is list of ability stat names,
     # 3rd elem is list of corresponding ability stat numbers
 
@@ -147,6 +153,8 @@ def replace_template_strings(name, role, desc, hp, armor, shield, ability_dets):
 
     temp_str = temp_str.replace('{hero_name_title}', display_name)
     temp_str = temp_str.replace('{hero_name}', display_name)
+
+    # TODO find cleaner way to do this
     if role == 'Tank':
         temp_str = temp_str.replace('{tank_active}', 'active-nav')
         temp_str = temp_str.replace('{damage_active}', '')
@@ -227,11 +235,18 @@ def write_to_file(hero_name, html):
         newfile.write(html)
 
 
-if __name__ == '__main__':
+def main():
     for hero_name in hero_names:
         page_url = get_hero_url(hero_name)
         page_soup = fetch_content(page_url)
         hero_role, hero_desc, hero_hp, hero_armor, hero_shield = fetch_hero_details(hero_name)
         ability_details = fetch_ability_details(page_soup)
-        hero_html = replace_template_strings(hero_name, hero_role, hero_desc, hero_hp, hero_armor, hero_shield, ability_details)
+        hero_html = replace_template_strings(hero_name, hero_role, hero_desc, hero_hp, hero_armor, hero_shield,
+                                             ability_details)
         write_to_file(hero_name, hero_html)
+
+
+if __name__ == '__main__':
+    main()
+
+# TODO profile to see how to speed up
