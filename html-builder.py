@@ -32,18 +32,24 @@ def fetch_hero_details(name):
 
     # Finds role
     role = re.search(r'role = ?(\[\[)?(\w+)[]\n]', source_text)
-    if role: role = role.group(2)
-    else: print('ERROR: role not found')
+    if role:
+        role = role.group(2)
+    else:
+        print('ERROR: role not found')
 
     # Finds description
     desc = re.search(r'== ?Overview ?==\n+(.*)\n', source_text)
-    if desc: desc = desc.group(1)
-    else: print('ERROR: description not found')
+    if desc:
+        desc = desc.group(1)
+    else:
+        print('ERROR: description not found')
 
     # Finds HP
     hp = re.search(r'health = ?(.+)\n', source_text)
-    if hp: hp = hp.group(1)
-    else: print('ERROR: hp not found')
+    if hp:
+        hp = hp.group(1)
+    else:
+        print('ERROR: hp not found')
 
     # Finds armor
     armor = re.search(r'armor = ?(\d+.+)\n', source_text)
@@ -103,9 +109,10 @@ def fetch_ability_details(soup):
     return ability_dets
 
 
-def replace_template_strings(name, role, desc, hp, armor, shield, ability_dets):
+def replace_template_strings(hero_details, ability_dets):
     # ability dets is a list of tuples. in each tuple, 1st elem is ability name, 2nd elem is list of ability stat names,
     # 3rd elem is list of corresponding ability stat numbers
+    name, role, desc, hp, armor, shield = hero_details
 
     template = open('templates/hero.html')
     temp_str = template.read()
@@ -188,7 +195,7 @@ def replace_template_strings(name, role, desc, hp, armor, shield, ability_dets):
     return temp_str
 
 
-def write_to_file(hero_name, html):
+def write_to_file(hero_name, html, debug):
     if hero_name == 'Soldier:_76':
         hero_name = 'soldier-76'
     elif hero_name == 'D.Va':
@@ -198,21 +205,24 @@ def write_to_file(hero_name, html):
 
     filename = f'{hero_name.lower()}.html'
 
-    print(f'Writing to out/{filename}\n')
-    # with open(f'out/{filename}', 'w', encoding='utf-8') as newfile:
-    #     print(f'Writing to out/{filename}\n')
-    #     newfile.write(html)
+    if debug:
+        print(f'Writing to out/{filename}\n')
+    else:
+        with open(f'out/{filename}', 'w', encoding='utf-8') as newfile:
+            print(f'Writing to out/{filename}\n')
+            newfile.write(html)
 
 
 def main():
+    DEBUG = False
     for hero_name in hero_names:
         page_url = get_hero_url(hero_name)
         page_soup = fetch_content(page_url)
-        hero_role, hero_desc, hero_hp, hero_armor, hero_shield = fetch_hero_details(hero_name)
+        hero_details = fetch_hero_details(hero_name)
         ability_details = fetch_ability_details(page_soup)
-        hero_html = replace_template_strings(hero_name, hero_role, hero_desc, hero_hp, hero_armor, hero_shield,
+        hero_html = replace_template_strings(hero_details,
                                              ability_details)
-        write_to_file(hero_name, hero_html)
+        write_to_file(hero_name, hero_html, DEBUG)
 
 
 if __name__ == '__main__':
