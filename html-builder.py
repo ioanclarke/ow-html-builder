@@ -1,3 +1,5 @@
+import re
+
 import requests
 from bs4 import BeautifulSoup as Bs
 
@@ -29,64 +31,31 @@ def fetch_hero_details(name):
     source_text = soup.find('textarea', {'id': 'wpTextbox1'}).text
 
     # Finds role
-    # TODO fix role grabber for Ana and Moira
-    role = None
-    if name == 'Ana' or name == 'Moira':  # Because they have weird role formats.
-        role = 'Support'
-    else:
-        role_uncut = None
-        role_pos = source_text.find('role =')
-        if source_text[role_pos + 6] == ' ':
-            role_uncut = source_text[role_pos + 9:]
-        elif source_text[role_pos + 6] == '[':
-            role_uncut = source_text[role_pos + 8:]
-        else:
-            print('WHACK ASS ROLE PLACEMENT')
-        if role_uncut:
-            role = role_uncut[:role_uncut.find(']')]
-        else:
-            print('ERROR: role_uncut DOESN\'T EXIST')
+    role = re.search(r'role = ?(\[\[)?(\w+)[]\n]', source_text)
+    if role: role = role.group(2)
+    else: print('ERROR: role not found')
+
     # Finds description
-    overview_pos = source_text.find('==Overview==')
-    if overview_pos == -1:
-        overview_pos = source_text.find('== Overview ==')
-    desc_uncut = source_text[overview_pos + 13:]
-    pos = 0
-    desc_start = None
-    found = False
-    while not found:
-        if desc_uncut[pos].isalpha():
-            desc_start = pos
-            found = True
-        pos += 1
-    if desc_start is None:
-        print('ERROR: COULD NOT FIND DESCRIPTION')
-    desc_end = min(desc_uncut[desc_start:].find('\n'), desc_uncut[desc_start:].find('<'))
-    desc = desc_uncut[desc_start:desc_end]
+    desc = re.search(r'== ?Overview ?==\n+(.*)\n', source_text)
+    if desc: desc = desc.group(1)
+    else: print('ERROR: description not found')
 
     # Finds HP
-    health_pos = source_text.find('health =')
-    hp_uncut = source_text[health_pos + 8:]
-    hp = hp_uncut[:hp_uncut.find('\n')].strip()
+    hp = re.search(r'health = ?(.+)\n', source_text)
+    if hp: hp = hp.group(1)
+    else: print('ERROR: hp not found')
 
-    armor_pos = source_text.find('armor =')
-    if armor_pos == -1:
-        armor = None
-    else:
-        armor_uncut = source_text[armor_pos + 7:]
-        armor = armor_uncut[:armor_uncut.find('\n')].strip()
+    # Finds armor
+    armor = re.search(r'armor = ?(\d+.+)\n', source_text)
+    if armor:
+        armor = armor.group(1)
 
-    shield_pos = source_text.find('shield =')
-    if shield_pos == -1:
-        shield = None
-    else:
-        shield_uncut = source_text[shield_pos + 8:]
-        shield = shield_uncut[:shield_uncut.find('\n')].strip()
+    # Finds shield
+    shield = re.search(r'shield = ?(\d+)\n', source_text)
+    if shield:
+        shield = shield.group(1)
 
-    if not role:
-        print('ERROR: ROLE NOT FOUND')
-    else:
-        return role, desc, hp, armor, shield
+    return role, desc, hp, armor, shield
 
 
 def fetch_ability_details(soup):
@@ -229,10 +198,10 @@ def write_to_file(hero_name, html):
 
     filename = f'{hero_name.lower()}.html'
 
-    # print(f'Writing to out/{filename}\n')
-    with open(f'out/{filename}', 'w', encoding='utf-8') as newfile:
-        print(f'Writing to out/{filename}\n')
-        newfile.write(html)
+    print(f'Writing to out/{filename}\n')
+    # with open(f'out/{filename}', 'w', encoding='utf-8') as newfile:
+    #     print(f'Writing to out/{filename}\n')
+    #     newfile.write(html)
 
 
 def main():
